@@ -1,4 +1,8 @@
 {
+  "scripts": {
+    "start": "gulp",
+    "postinstall": "subl ."
+  },
   "devDependencies": {
     "autoprefixer": "^6.3.6",
     "browser-sync": "^2.12.12",
