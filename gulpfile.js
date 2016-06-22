@@ -1,3 +1,5 @@
+'use strict';
+
 var gulp = require('gulp');
 var $ = require('gulp-load-plugins')();
 var autoprefixer = require('autoprefixer');
@@ -8,13 +10,13 @@ gulp.task('build', ['css', 'html', 'images']);
 gulp.task('clean', function() {
 	return gulp.src('dist', {read: false})
 		.pipe($.clean());
-})
+});
 
 gulp.task('css', ['styles'], function() {
 	return gulp.src('src/*.css')
 		.pipe($.cssmin())
 		.pipe(gulp.dest('dist'));
-})
+});
 
 gulp.task('html', function() {
 	return gulp.src('src/*.html')
