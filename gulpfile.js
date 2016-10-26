@@ -9,17 +9,17 @@ var browserSync = require('browser-sync').create();
 var watch_path = 'tmp';
 
 gulp.task('pug', function() {
-  gulp.src('src/*.pug')
+  return gulp.src('src/*.pug')
     .pipe(pug({pretty: true}).on('error', function(error) { console.error(error.message); }))
     .pipe(gulp.dest(watch_path))
-    .pipe(browserSync.stream({once: true}))
+    .pipe(browserSync.stream());
 });
 
 gulp.task('sass', function() {
-  gulp.src('src/styles/*.scss')
+  return gulp.src('src/styles/*.scss')
     .pipe(sass().on('error', sass.logError))
     .pipe(gulp.dest(watch_path))
-    .pipe(browserSync.stream())
+    .pipe(browserSync.stream());
 });
 
 gulp.task('watch', ['pug', 'sass'], function() {
