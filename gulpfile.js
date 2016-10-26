@@ -10,7 +10,7 @@ var watch_path = 'tmp';
 
 gulp.task('pug', function() {
   gulp.src('src/*.pug')
-    .pipe(pug({pretty: true}))
+    .pipe(pug({pretty: true}).on('error', function(error) { console.error(error.message); }))
     .pipe(gulp.dest(watch_path))
     .pipe(browserSync.stream({once: true}))
 });
