@@ -7,6 +7,7 @@ var autoprefixer = require('autoprefixer');
 var browserSync = require('browser-sync').create();
 
 var watch_path = 'tmp';
+var indentedSyntax, inquirer = require('inquirer');
 
 gulp.task('pug', function() {
   return gulp.src('src/*.pug')
@@ -16,8 +17,27 @@ gulp.task('pug', function() {
 });
 
 gulp.task('sass', function() {
-  return gulp.src('src/styles/*.scss')
-    .pipe(sass().on('error', sass.logError))
+  if (indentedSyntax === undefined) return inquirer.prompt([{
+    type: 'list',
+    name: 'indentedSyntax',
+    message: 'Which Sass syntax do you use?',
+    choices: [{
+      name: 'SCSS syntax',
+      value: false
+    }, {
+      name: 'Sass INDENTED syntax',
+      value: true
+    }],
+    default: 0
+  }]).then(function(answers) {
+    indentedSyntax = answers.indentedSyntax;
+    return gulp.src('src/styles/*.scss')
+      .pipe(sass({indentedSyntax: indentedSyntax}).on('error', sass.logError))
+      .pipe(gulp.dest(watch_path))
+      .pipe(browserSync.stream());
+  });
+  else return gulp.src('src/styles/*.scss')
+    .pipe(sass({indentedSyntax: indentedSyntax}).on('error', sass.logError))
     .pipe(gulp.dest(watch_path))
     .pipe(browserSync.stream());
 });
