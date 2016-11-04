@@ -1,54 +1,55 @@
-'use strict';
+const gulp = require('gulp');
+const pug = require('gulp-pug');
+const sass = require('gulp-sass');
+// const autoprefixer = require('autoprefixer');
+const browserSync = require('browser-sync').create();
+const inquirer = require('inquirer');
 
-var gulp = require('gulp');
-var pug = require('gulp-pug');
-var sass = require('gulp-sass');
-var autoprefixer = require('autoprefixer');
-var browserSync = require('browser-sync').create();
+const watch_path = 'tmp';
+let indentedSyntax;
 
-var watch_path = 'tmp';
-var indentedSyntax, inquirer = require('inquirer');
+gulp.task('pug', () =>
+  gulp.src('src/*.pug')
+    .pipe(pug({ pretty: true }).on('error', (error) => { console.error(error.message); }))
+    .pipe(gulp.dest(watch_path))
+    .pipe(browserSync.stream())
+);
 
-gulp.task('pug', function() {
-  return gulp.src('src/*.pug')
-    .pipe(pug({pretty: true}).on('error', function(error) { console.error(error.message); }))
+gulp.task('sass', () => {
+  if (indentedSyntax === undefined) {
+    return inquirer.prompt([{
+      type: 'list',
+      name: 'indentedSyntax',
+      message: 'Which Sass syntax do you use?',
+      choices: [{
+        name: 'SCSS syntax',
+        value: false,
+      }, {
+        name: 'Sass INDENTED syntax',
+        value: true,
+      }],
+      default: 0,
+    }]).then((answers) => {
+      indentedSyntax = answers.indentedSyntax;
+      return gulp.src('src/styles/*.scss')
+        .pipe(sass({ indentedSyntax }).on('error', sass.logError))
+        .pipe(gulp.dest(watch_path))
+        .pipe(browserSync.stream());
+    });
+  }
+  return gulp.src('src/styles/*.scss')
+    .pipe(sass({ indentedSyntax }).on('error', sass.logError))
     .pipe(gulp.dest(watch_path))
     .pipe(browserSync.stream());
 });
 
-gulp.task('sass', function() {
-  if (indentedSyntax === undefined) return inquirer.prompt([{
-    type: 'list',
-    name: 'indentedSyntax',
-    message: 'Which Sass syntax do you use?',
-    choices: [{
-      name: 'SCSS syntax',
-      value: false
-    }, {
-      name: 'Sass INDENTED syntax',
-      value: true
-    }],
-    default: 0
-  }]).then(function(answers) {
-    indentedSyntax = answers.indentedSyntax;
-    return gulp.src('src/styles/*.scss')
-      .pipe(sass({indentedSyntax: indentedSyntax}).on('error', sass.logError))
-      .pipe(gulp.dest(watch_path))
-      .pipe(browserSync.stream());
-  });
-  else return gulp.src('src/styles/*.scss')
-    .pipe(sass({indentedSyntax: indentedSyntax}).on('error', sass.logError))
-    .pipe(gulp.dest(watch_path))
-    .pipe(browserSync.stream());
-});
-
-gulp.task('watch', ['pug', 'sass'], function() {
+gulp.task('watch', ['pug', 'sass'], () => {
   browserSync.init({
     host: process.env.IP || null,
     port: process.env.PORT || 3000,
-    server: watch_path
+    server: watch_path,
   });
 
   gulp.watch('src/**/*.pug', ['pug']);
-  gulp.watch("src/**/*.scss", ['sass']);
+  gulp.watch('src/**/*.scss', ['sass']);
 });
